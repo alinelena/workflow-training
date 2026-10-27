@@ -1,6 +1,6 @@
 # Product Requirements Document: Guardrailed Curriculum Active Learning WorkGraph (EpochMesh + Necropsy-Rewind)
 
-**Status**: Approved Concept $\to$ Formal PRD  
+**Status**: Approved Concept → Formal PRD  
 **Author**: Antigravity (Pair Programming Agent)  
 **Date**: 2026-10-27  
 **Artifact Path**: `docs/prds/guardrailed-curriculum-active-learning-workgraph-2026-10-27.md`  
@@ -12,7 +12,7 @@
 ## 1. Executive Summary
 
 ### 1.1 One-Sentence Elevator Pitch
-An automated, fault-tolerant active learning WorkGraph in `aiida-workgraph` that iteratively fine-tunes MACE foundation models across an ascending thermodynamic curriculum (0 K EOS $\to$ isobaric NPT MD) using Quantum ESPRESSO DFT labeling, protected by an in-flight **Necropsy-Rewind** stability guardrail that prevents unphysical crash structures from ever reaching the electronic structure solver.
+An automated, fault-tolerant active learning WorkGraph in `aiida-workgraph` that iteratively fine-tunes MACE foundation models across an ascending thermodynamic curriculum (0 K EOS → isobaric NPT MD) using Quantum ESPRESSO DFT labeling, protected by an in-flight **Necropsy-Rewind** stability guardrail that prevents unphysical crash structures from ever reaching the electronic structure solver.
 
 ### 1.2 Target User & Use Case
 * **Target User**: Computational materials scientists, solid-state chemists, and atomistic simulation engineers seeking to adapt general-purpose MACE foundation models (e.g. `mace_mp`) to specific crystalline systems, high-temperature phase diagrams, or high-pressure regimes without manual active-learning script orchestration.
@@ -22,7 +22,7 @@ An automated, fault-tolerant active learning WorkGraph in `aiida-workgraph` that
 * **DFT Completion Reliability**: $\ge 98\%$ electronic SCF convergence rate for all candidate structures submitted to Quantum ESPRESSO `PwBaseWorkChain` (zero deadlocked WorkGraph processes due to atomic overlap or unphysical cell distortion).
 * **Zero Catastrophic Forgetting**: The fine-tuned MACE model must preserve 0 K harmonic mechanical stability:
   * Bulk modulus variation $|\Delta B_0| / B_0^{\text{DFT}} < 6\%$.
-  * Ground-state force residual $F_{\max} \le 0.025\text{ eV/\AA}$.
+  * Ground-state force residual $F_{\max} \le 0.025\text{ eV/Å}$.
   * Zero imaginary acoustic phonon frequencies at $\Gamma$.
 * **MD Thermal Stability**: The final model must complete a continuous 100 ps NPT trajectory at the target temperature without triggering stability watchdogs or unphysical volume expansion/collapse.
 * **Orchestration Fault Isolation**: Failed DFT calculations or aborted MD runs are quarantined without crashing the parent WorkGraph; verified training points are immutably grouped with complete AiiDA provenance.
@@ -30,7 +30,7 @@ An automated, fault-tolerant active learning WorkGraph in `aiida-workgraph` that
 ### 1.4 Scope Summary
 * **In-Scope (v1 / MVP)**:
   - Stage 0 (Cold Start): Equation of State (EOS) isotropic volume deformations ($\pm 10\%$) + harmonic rattles.
-  - Stage 1 (Thermal Exploration): Ascending isobaric $(T, P)$ NPT MD ramps (e.g., $300\text{ K} \to 600\text{ K} \to 1000\text{ K}$).
+  - Stage 1 (Thermal Exploration): Ascending isobaric $(T, P)$ NPT MD ramps (e.g., 300 K → 600 K → 1000 K).
   - In-memory circular trajectory ring-buffer with real-time multi-modal watchdogs (atomic clashes, force explosions, volume dilation).
   - Reverse Z-score inflection cusp extraction ($t^*$) discarding unphysical corpse frames.
   - Quantum ESPRESSO dynamic batch fan-out via `workgraph.map_zone` with concurrency cap (`max_number_jobs`).
@@ -49,7 +49,7 @@ An automated, fault-tolerant active learning WorkGraph in `aiida-workgraph` that
 ### 2.1 The Pain Point
 Active learning for machine-learned interatomic potentials is plagued by the **"Garbage-In, Deadlock-Out" DFT Trap**:
 1. When a foundation MLIP explores high temperatures or strains, it eventually falls into an "extrapolation hole"—an unconstrained soft-core region where repulsive forces are underestimated.
-2. Under thermal inertia, atoms fuse ($r_{ij} < 1.0\text{ \AA}$) or unit cells explosively dilate.
+2. Under thermal inertia, atoms fuse ($r_{ij} < 1.0\text{ Å}$) or unit cells explosively dilate.
 3. Naive active learning workflows sample the crashed frame and submit it to DFT.
 4. Quantum ESPRESSO encounters overlapping atomic pseudopotential cores, resulting in extreme charge sloshing, negative charge densities, or non-convergent Davidson diagonalization.
 5. In automated workflow managers, an unhandled DFT failure stalls the pipeline, requiring manual database surgery to rescue the calculation.
@@ -131,7 +131,7 @@ The user submits a single `StructureData` and `ModelData` to AiiDA. The workflow
 ### 4.1 Functional Requirements
 
 #### Stage 0: Cold-Start & Baseline Initialization
-* **FR-01 (Priority: P0)**: The system SHALL generate an Equation of State (EOS) deformation series covering $\pm 10\%$ volumetric strain (minimum 7 points) and 4 random harmonic displacement supercells ($0.02 - 0.05\text{ \AA}$ displacement) from the initial structure.
+* **FR-01 (Priority: P0)**: The system SHALL generate an Equation of State (EOS) deformation series covering $\pm 10\%$ volumetric strain (minimum 7 points) and 4 random harmonic displacement supercells (0.02 Å to 0.05 Å displacement) from the initial structure.
 * **FR-02 (Priority: P0)**: The system SHALL evaluate all Stage 0 configurations with Quantum ESPRESSO (`PwBaseWorkChain`), storing energies, forces, and Cauchy stress tensors.
 * **FR-03 (Priority: P0)**: The system SHALL register all Stage 0 DFT calculations in an immutable AiiDA `Group` labeled `al_anchor_reservoir_<uuid>`, serving as the permanent anti-forgetting replay baseline.
 * **FR-04 (Priority: P0)**: The system SHALL perform an initial MACE fine-tuning run via `mlip.train` on the Stage 0 dataset to align energy offsets and stress calibrations before starting MD.
@@ -139,14 +139,28 @@ The user submits a single `StructureData` and `ModelData` to AiiDA. The workflow
 #### Necropsy-Rewind Stability Engine
 * **FR-05 (Priority: P0)**: The system SHALL monitor molecular dynamics trajectories in real time using an in-memory zero-allocation circular FIFO ring buffer storing the latest $W \ge 100$ frames (positions, velocities, forces, cell, energies).
 * **FR-06 (Priority: P0)**: The system SHALL evaluate three orthogonal safety watchdogs at every MD integration step:
+$$
+\begin{aligned}
+\text{Atomic Clash:} \quad & \exists (i, j) : r_{ij} < 0.70 \times (R_{\text{cov}, i} + R_{\text{cov}, j}) \\
+\text{Force Explosion:} \quad & \max_i \|\mathbf{F}_i\| > 25.0 \text{ eV/Å} \\
+\text{Volume Dilation:} \quad & \frac{|V(t) - V_0|}{V_0} > 0.20 \quad \lor \quad \kappa(\mathbf{h}) < 0.15
+\end{aligned}
+$$
   - *Atomic Clash Watchdog*: $\exists (i, j) : r_{ij} < 0.70 \times (R_{\text{cov}, i} + R_{\text{cov}, j})$.
-  - *Force Explosion Watchdog*: $\max_i \|\mathbf{F}_i\| > 25.0\text{ eV/\AA}$ or presence of `NaN`/`Inf`.
+  - *Force Explosion Watchdog*: $\max_i \|\mathbf{F}_i\| > 25.0\text{ eV/Å}$ or presence of `NaN`/`Inf`.
   - *Volume Dilation Watchdog*: $|V(t) - V_0| / V_0 > 0.20$ or cell condition number $< 0.15$.
 * **FR-07 (Priority: P0)**: Upon breach of any watchdog, the system SHALL immediately halt MD dynamics, discard the crashed terminal configuration ($t_{\text{crash}}$), and execute a reverse baseline Z-score inflection search across the ring buffer to locate the pre-collapse cusp $t^*$.
 * **FR-08 (Priority: P0)**: The extracted cusp configuration $t^*$ SHALL satisfy a strict pre-flight physical safety check ($\min r_{ij} \ge 0.85 (R_{\text{cov}, i} + R_{\text{cov}, j})$) before being forwarded to Quantum ESPRESSO.
 
 #### Active Learning Filtering & Quantum ESPRESSO Labeling
-* **FR-09 (Priority: P0)**: During stable MD trajectories (where watchdogs are not tripped), the system SHALL filter candidate frames using a tri-zone force variance / uncertainty rule ($\sigma_{\text{low}} \le \sigma_F \le \sigma_{\text{high}}$), discarding both redundant low-energy frames ($\sigma_F < \sigma_{\text{low}}$) and unphysical outliers ($\sigma_F > \sigma_{\text{high}}$).
+* **FR-09 (Priority: P0)**: During stable MD trajectories (where watchdogs are not tripped), the system SHALL filter candidate frames using a tri-zone force variance / uncertainty rule ($\sigma_{\text{low}} \le \sigma_F \le \sigma_{\text{high}}$), discarding both redundant low-energy frames ($\sigma_F < \sigma_{\text{low}}$) and unphysical outliers ($\sigma_F > \sigma_{\text{high}}$):
+$$
+\begin{cases}
+\sigma_F < \sigma_{\text{low}} & \text{Equilibrium (discard)} \\
+\sigma_{\text{low}} \le \sigma_F \le \sigma_{\text{high}} & \text{Active Learning Candidate} \\
+\sigma_F > \sigma_{\text{high}} & \text{Unphysical Runaway (discard terminal frame)}
+\end{cases}
+$$
 * **FR-10 (Priority: P0)**: The system SHALL dispatch candidate structures dynamically to Quantum ESPRESSO `PwBaseWorkChain` using `workgraph.map_zone`, enforcing a user-configurable concurrency cap (`wg.max_number_jobs = 16`).
 * **FR-11 (Priority: P0)**: The system SHALL automatically parameterize Quantum ESPRESSO for high electronic stability on strained frontier geometries (Conjugate Gradient diagonalization, adaptive mixing `mixing_beta = 0.20`, Marzari-Vanderbilt cold smearing `degauss = 0.02 Ry`, and full stress computation `tstress = True`).
 * **FR-12 (Priority: P1)**: If a DFT calculation fails to converge within 100 iterations, the system SHALL quarantine the structure into a `QuarantineData` node and continue without deadlocking the WorkGraph.
@@ -155,14 +169,14 @@ The user submits a single `StructureData` and `ModelData` to AiiDA. The workflow
 * **FR-13 (Priority: P0)**: The system SHALL append newly validated DFT frames to the training dataset while enforcing a strict **20% Anchor-Replay Reservoir quota** drawn from Stage 0 baseline structures.
 * **FR-14 (Priority: P0)**: The system SHALL execute `mlip.train` with Huber loss, loss weights $\lambda_E = 1.0$, $\lambda_F = 20.0$, $\lambda_S = 5.0$, AdamW optimizer ($\text{lr} = 10^{-4}$), and `ReduceLROnPlateau` scheduler (patience 6 epochs, max 50 epochs).
 * **FR-15 (Priority: P0)**: Before promoting a newly fine-tuned `ModelData` node, the system SHALL evaluate the 5-Stage Invariance Gate:
-  1. Pristine 0 K residual force $F_{\max} \le 0.025\text{ eV/\AA}$.
+  1. Pristine 0 K residual force $F_{\max} \le 0.025\text{ eV/Å}$.
   2. Bulk modulus deviation $|\Delta B_0| / B_0^{\text{DFT}} < 8\%$ with positive curvature ($B_0 > 0$).
-  3. 2 ps NVE burn-in energy drift $< 10^{-4}\text{ eV/(atom}\cdot\text{ps})$.
+  3. 2 ps NVE burn-in energy drift $< 10^{-4}\text{ eV/(\text{atom}\cdot\text{ps})}$.
 * **FR-16 (Priority: P0)**: Upon passing the gate, the system SHALL hot-swap the output `ModelData` into the WorkGraph context (`wg.context['current_model']`), propagating the updated potential to the next curriculum temperature ramp.
 
 ### 4.2 Non-Functional Requirements
 * **NFR-01 (Memory Overhead)**: The in-memory trajectory ring buffer SHALL consume $\le 10\text{ MB}$ of RAM for systems up to 1,000 atoms.
-* **NFR-02 (Step Latency)**: Real-time watchdog evaluation in ASE/janus MD SHALL incur $\le 20\ \mu\text{s}$ per MD integration step ($< 2\%$ total simulation overhead on GPU).
+* **NFR-02 (Step Latency)**: Real-time watchdog evaluation in ASE/janus MD SHALL incur $\le 20\ \mu\mathrm{s}$ per MD integration step ($< 2\%$ total simulation overhead on GPU).
 * **NFR-03 (AiiDA Provenance)**: Every fine-tuned `ModelData`, candidate `StructureData`, and DFT output SHALL be permanently connected in the AiiDA provenance graph, enabling full retrospective reproduction.
 * **NFR-04 (Fault Containment)**: Any unexpected crash in an individual sub-task SHALL fail soft, logging diagnostic telemetry to an AiiDA `Dict` node without terminating the top-level WorkGraph.
 
@@ -273,7 +287,7 @@ def build_mace_qe_active_learning_workgraph(
 
 ### 7.1 Verification Gate (Automated Tests before Merge)
 1. **Unit Test (`test_necropsy_buffer.py`)**:
-   - Verify `TrajectoryRingBuffer` zero-allocation memory write speed ($< 20\ \mu\text{s}$).
+   - Verify `TrajectoryRingBuffer` zero-allocation memory write speed ($< 20\ \mu\mathrm{s}$).
    - Simulate a synthetic runaway trajectory; verify reverse Z-score correctly flags $t^*$ and discards the crash frame.
 2. **Integration Test (`test_eos_cold_start.py`)**:
    - Run Stage 0 subgraph on a 2-atom Si cell; verify EOS deformations match Birch-Murnaghan fits and populate the AiiDA Anchor Group.
@@ -285,7 +299,7 @@ def build_mace_qe_active_learning_workgraph(
 * **Milestone 1 (Foundations & Necropsy Engine)**: Implement `tools/necropsy_rewind.py` with the ring buffer and ASE observer hook; validate against synthetic unphysical trajectories.
 * **Milestone 2 (WorkGraph Subgraphs & Dynamic Fan-Out)**: Implement `eos_cold_start_subgraph` and `dft_batch_map_zone` with `max_number_jobs` concurrency control.
 * **Milestone 3 (Loop Closure & Gate Integration)**: Implement the top-level `While` loop orchestrator, `dataset_collector_task` with 20% anchor replay, and the 5-Stage Invariance Gate.
-* **Milestone 4 (End-to-End Validation & Documentation)**: Run a complete thermal curriculum active learning campaign ($300\text{ K} \to 800\text{ K}$) on a benchmark crystal system (e.g. Si or $\text{CsPbI}_3$).
+* **Milestone 4 (End-to-End Validation & Documentation)**: Run a complete thermal curriculum active learning campaign (300 K → 800 K) on a benchmark crystal system (e.g. Si or $\text{CsPbI}_3$).
 
 ---
 

@@ -20,7 +20,7 @@ A publication-quality SVG diagram of the dataset building and fine-tuning pipeli
 
 ## 2. Requirements & Environment
 
-- **Python**: $\ge 3.12$
+- **Python**: $\ge$ 3.12 (or `>= 3.12`)
 - **Core Dependencies**: `janus-core >= 0.9.8`, `aiida-workgraph >= 0.4.0`, `aiida-mlip >= 0.1.0`, `ase`, `numpy`, `scipy`.
 - **Headless Execution Rule**: All calculations and training configurations automatically inject `tracker: false` to disable CodeCarbon emission overhead.
 

@@ -16,17 +16,17 @@
 ## 2. Synthesized Concepts Across the Lenses
 
 ### Concept 1: The EpochMesh Curriculum (Battle-Tested Staged Orchestrator)
-* **One-line pitch**: A staged macro-batching AiiDA WorkGraph that executes discrete, immutable epoch sub-workgraphs across an ascending thermodynamic ladder (EOS cold-start $\to$ isobaric NPT ramps) with tri-zone force filtering and an AiiDA `Group` blackboard.
+* **One-line pitch**: A staged macro-batching AiiDA WorkGraph that executes discrete, immutable epoch sub-workgraphs across an ascending thermodynamic ladder (EOS cold-start → isobaric NPT ramps) with tri-zone force filtering and an AiiDA `Group` blackboard.
 * **Originating lenses**: Architecture + Prior Art (DP-GEN2 & AiiDA-WorkGraph patterns).
 * **How it works**:
   - Rather than an unrolling dynamic cyclic graph, a top-level controller schedules immutable sub-workgraphs per epoch ($E_0, E_1, \dots, E_K$).
   - Stages progress systematically:
     - **Stage 0 (Cold Start)**: Isotropic/shear EOS volume deformations ($\pm 10\%$) and harmonic rattles.
-    - **Stage 1 (Thermal Exploration)**: Ascending $(T, P)$ ladders ($300\text{ K} \to 600\text{ K} \to 1000\text{ K}$).
+    - **Stage 1 (Thermal Exploration)**: Ascending $(T, P)$ ladders (300 K → 600 K → 1000 K).
     - **Stage 2 (Boundary Stress)**: Defected or superheated supercells.
   - Candidate frames from `mlip.md` are tri-zone filtered: $\sigma_F < \sigma_{\text{low}}$ (accurate, discard); $\sigma_{\text{low}} \le \sigma_F \le \sigma_{\text{high}}$ (candidate pool); $\sigma_F > \sigma_{\text{high}}$ (unphysical explosion, discard).
   - Selected frames are labeled concurrently via `PwBaseWorkChain` and appended into an AiiDA dataset `Group`.
-  - `mlip.train` warm-starts from the baseline checkpoint. When candidate selection rate falls below $1\%$, the workgraph advances to the next thermodynamic stage.
+  - `mlip.train` warm-starts from the baseline checkpoint. When candidate selection rate falls below 1%, the workgraph advances to the next thermodynamic stage.
 * **Strongest arguments for**:
   - Proven reliability across literature (DP-GEN); avoids complex dynamic DAG unrolling in `aiida-workgraph`.
   - Rock-solid fault isolation: if epoch 3 fails, epochs 0–2 remain valid, inspectable, and uncorrupted.
@@ -41,7 +41,7 @@
 * **Originating lenses**: Active Learning Criteria + Pre-Mortem + Prior Art (FLARE on-the-fly).
 * **How it works**:
   - `mlip.md` runs with a lightweight in-memory circular ring buffer caching the last 50 frames.
-  - Multi-modal crash watchdogs detect breakdown: interatomic clash $r_{ij} < 0.70 (R_{\text{cov}, i} + R_{\text{cov}, j})$, force explosion $\|\mathbf{F}_i\| > 25\text{ eV/\AA}$, or instantaneous volume dilation $> 15\%$.
+  - Multi-modal crash watchdogs detect breakdown: interatomic clash $r_{ij} < 0.70 (R_{\text{cov}, i} + R_{\text{cov}, j})$, force explosion $\|\mathbf{F}_i\| > 25\text{ eV/Å}$, or instantaneous volume dilation $> 15\%$.
   - The crash frame is **discarded** (it causes electronic charge sloshing and DFT SCF failure). The workflow scans backward along the ring buffer to the inflection point $t^*$ where force uncertainty first accelerated.
   - Frames at $t^* - \Delta t$ and $t^*$ are sent to Quantum ESPRESSO with automated self-healing SCF fallbacks (Conjugate Gradient diagonalization, adaptive smearing).
   - Synthetic Ziegler-Biersack-Littmark (ZBL) repulsive priors are automatically injected for sub-threshold distances.
@@ -58,11 +58,11 @@
 * **One-line pitch**: Eliminates deep-ensemble compute bottlenecks by freezing MACE's equivariant message-passing backbone and active-learning only an ensemble of scalar readout heads with a baseline replay reservoir, enabling 2-minute GPU retraining per cycle.
 * **Originating lenses**: Prior Art (CamML Multi-Head MACE) + Pre-Mortem (Catastrophic Forgetting).
 * **How it works**:
-  - Loads foundation checkpoint (`MACE-MP-0`) and attaches $K=4$ or 8 randomly seeded readout heads.
-  - Single-pass inference during MD evaluates epistemic force variance across the heads with $< 5\%$ compute overhead compared to a single model (no $4\times$ deep ensemble penalty).
-  - Every retraining batch enforces an **Anchor-Replay Reservoir**: $30\%$ of the training batch is permanently drawn from the foundation baseline dataset (equilibrium 0 K, standard EOS curves).
+  - Loads foundation checkpoint (`MACE-MP-0`) and attaches $K=4$ or $K=8$ randomly seeded readout heads.
+  - Single-pass inference during MD evaluates epistemic force variance across the heads with $< 5\%$ compute overhead compared to a single model (no 4× deep ensemble penalty).
+  - Every retraining batch enforces an **Anchor-Replay Reservoir**: 30% of the training batch is permanently drawn from the foundation baseline dataset (equilibrium 0 K, standard EOS curves).
   - `mlip.train` updates only the linear/readout parameters, executing in 1–3 minutes on a single GPU.
-  - Candidate checkpoints must pass an invariance gate (zero imaginary phonon frequencies at $\Gamma$, bulk modulus $B_0$ within $5\%$ of baseline) before deployment.
+  - Candidate checkpoints must pass an invariance gate (zero imaginary phonon frequencies at $\Gamma$, bulk modulus $B_0$ within 5% of baseline) before deployment.
 * **Strongest arguments for**:
   - Eliminates catastrophic forgetting of foundation properties (negative-energy sinkholes, elastic collapse).
   - Turns retraining from a multi-hour bottleneck into a sub-5-minute AiiDA workgraph task.
@@ -123,7 +123,7 @@
 ## 4. The Elephant's Synthesis
 
 - **Most Viable Direction for this Repo**: **Hybrid of Concept 1 (EpochMesh Curriculum) + Concept 2 (Necropsy-Rewind Guardrail)**.
-  - Building discrete, staged epoch subgraphs (EOS $\to$ NPT) inside `aiida-workgraph` is 100% compliant with existing `aiida-mlip` capabilities.
+  - Building discrete, staged epoch subgraphs (EOS → NPT) inside `aiida-workgraph` is 100% compliant with existing `aiida-mlip` capabilities.
   - Adding a **trajectory rewind + geometric sanitizer** before `PwBaseWorkChain` is non-negotiable: without it, unphysical crash frames will inevitably cause Quantum ESPRESSO SCF divergence and stall your active learning loop.
 - **The Sleeper Pick**: **Concept 3 (Multi-Head Representation Freeze)**.
   - Freezing the message-passing core and fine-tuning only the readout heads with an anchor-replay buffer makes the retraining step trivial (minutes instead of hours) and protects against the model forgetting 0 K harmonic stability.
@@ -135,7 +135,7 @@
 ## 5. Top 3 Ranked Picks
 
 1. **The Guardrailed Curriculum Loop (EpochMesh + Necropsy-Rewind)**:
-   - *Reasoning*: Couples a rock-solid, stage-by-stage thermodynamic workflow (EOS $\to$ NPT) with pre-collapse trajectory rewinding and geometric pre-filtering, guaranteeing 99%+ DFT completion rates without deadlocking AiiDA.
+   - *Reasoning*: Couples a rock-solid, stage-by-stage thermodynamic workflow (EOS → NPT) with pre-collapse trajectory rewinding and geometric pre-filtering, guaranteeing 99%+ DFT completion rates without deadlocking AiiDA.
 2. **The Fast Multi-Head Anchor-Replay Loop**:
    - *Reasoning*: Drastically slashes compute time by using single-pass multi-head uncertainty and frozen-core transfer learning with baseline replay, preventing catastrophic forgetting.
 3. **The Virial Stress-Corrected NPT Loop**:

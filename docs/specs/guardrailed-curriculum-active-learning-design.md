@@ -1,19 +1,19 @@
 # DESIGN DOC: Guardrailed Curriculum Active Learning WorkGraph (EpochMesh + Necropsy-Rewind)
 
 ## 1. Why
-- **Problem**: Active learning molecular dynamics (MD) with MACE foundation models routinely discovers soft-core "extrapolation holes", leading to atomic clashes ($r_{ij} < 1.0\text{ \AA}$) or unit cell explosions. Submitting these unphysical crash frames to Quantum ESPRESSO causes electronic charge sloshing, negative charge densities, and non-convergent Davidson loops that deadlock automated AiiDA workflows. In addition, fine-tuning MACE without strict regularization causes catastrophic forgetting of 0 K harmonic wells and bulk modulus.
+- **Problem**: Active learning molecular dynamics (MD) with MACE foundation models routinely discovers soft-core "extrapolation holes", leading to atomic clashes ($r_{ij} < 1.0\text{ Å}$) or unit cell explosions. Submitting these unphysical crash frames to Quantum ESPRESSO causes electronic charge sloshing, negative charge densities, and non-convergent Davidson loops that deadlock automated AiiDA workflows. In addition, fine-tuning MACE without strict regularization causes catastrophic forgetting of 0 K harmonic wells and bulk modulus.
 - **Reference**: Grounded in the formal PRD at `docs/prds/guardrailed-curriculum-active-learning-workgraph-2026-10-27.md` and conceptual brief at `docs/eg-brainstorms/mace-qe-active-learning-workgraph-2026-10-27.md`.
 
 ## 2. Scope
 ### In-Scope:
 - `pyproject.toml`: Modern packaging manifest configuring `hatchling` build backend, top-level package namespace `workflow_training`, dependencies (`aiida-core`, `aiida-workgraph`, `aiida-mlip`, `janus-core`, `ase`, `numpy`, `scipy`), and test dependencies (`pytest`, `pytest-cov`, `pytest-asyncio`).
 - `src/workflow_training/active_learning/ring_buffer.py`: Pre-allocated circular FIFO ring buffer storing positions, velocities, forces, cell, and scalar metrics with zero per-step memory allocations (< 15 µs overhead) and full query accessors.
-- `src/workflow_training/active_learning/watchdogs.py`: Multi-modal real-time physical watchdogs (atomic clashes $r_{ij} < 0.70 R_{\text{cov}}$, force spikes $> 25\text{ eV/\AA}$, volume dilation $> 20\%$, cell condition number $\kappa(\mathbf{h}) < 0.15$) implemented as an ASE observer hook.
+- `src/workflow_training/active_learning/watchdogs.py`: Multi-modal real-time physical watchdogs (atomic clashes $r_{ij} < 0.70 R_{\text{cov}}$, force spikes $\|\mathbf{F}_i\| > 25\text{ eV/Å}$, volume dilation $\Delta V / V_0 > 20\%$, cell condition number $\kappa(\mathbf{h}) < 0.15$) implemented as an ASE observer hook.
 - `src/workflow_training/active_learning/necropsy.py`: Post-mortem causal analyzer executing reverse baseline Z-score inflection search ($3.5\sigma$ over MAD baseline), discarding the corpse frame, and extracting the pre-collapse cusp $t^*$.
-- `src/workflow_training/active_learning/stages/stage0_cold_start.py`: Cold-start sub-workgraph builder generating EOS isotropic strains ($\pm 10\%$, 7 points) and harmonic rattles ($0.02 - 0.05\text{ \AA}$ on equilibrium), populating the permanent 20% Anchor-Replay Reservoir Group and initial `SinglefileData` dataset.
+- `src/workflow_training/active_learning/stages/stage0_cold_start.py`: Cold-start sub-workgraph builder generating EOS isotropic strains ($\pm 10\%$, 7 points) and harmonic rattles (0.02 Å to 0.05 Å on equilibrium), populating the permanent 20% Anchor-Replay Reservoir Group and initial `SinglefileData` dataset.
 - `src/workflow_training/active_learning/stages/stage1_thermal.py`: Thermal exploration sub-workgraph builder executing guarded NPT MD across an ascending $(T, P)$ ladder with single-model tri-zone force filtering.
 - `src/workflow_training/active_learning/dataset_collector.py`: AiiDA calcfunction accepting dynamic keyword inputs (`**gathered_dft`) to preserve full provenance, filtering out unconverged DFT runs, quarantining electronic failures into `QuarantineData` (`orm.Dict` + Group), blending 80% new data with 20% anchor replay, and writing extended `.xyz` (`orm.SinglefileData`).
-- `src/workflow_training/active_learning/invariance_gate.py`: 5-stage pre-deployment gate validating ground-state residual forces ($F_{\max} \le 0.025\text{ eV/\AA}$), bulk modulus retention ($|\Delta B_0| / B_0^{\text{DFT}} \le 8\%$, reconciled with PRD FR-15), acoustic $\Gamma$-phonon stability ($\omega^2 \ge -10^{-3}\text{ THz}^2$), $\mathrm{SO}(3)$ equivariance, and 2 ps NVE/NPT burn-in.
+- `src/workflow_training/active_learning/invariance_gate.py`: 5-stage pre-deployment gate validating ground-state residual forces ($F_{\max} \le 0.025\text{ eV/Å}$), bulk modulus retention ($|\Delta B_0| / B_0^{\text{DFT}} \le 8\%$, reconciled with PRD FR-15), acoustic $\Gamma$-phonon stability ($\omega^2 \ge -10^{-3}\text{ THz}^2$), $\mathrm{SO}(3)$ equivariance, and 2 ps NVE/NPT burn-in.
 - `src/workflow_training/active_learning/training_config.py`: AiiDA calcfunction generating `JanusConfigfile` for `mlip.train` with dynamic loss weights and headless `tracker: false`.
 - `src/workflow_training/active_learning/workgraph.py`: Top-level AiiDA WorkGraph integrating Stage 0, While loop zone, dynamic `workgraph.map_zone` (with concurrency throttle `max_number_jobs`), `select_next_model` context guard, `mlip.train` execution, and context hot-swapping.
 - `tests/`: Comprehensive unit and integration test suite with offline mock fixtures:
@@ -183,6 +183,21 @@ class NecropsyWatchdog:
 ```
 
 ### 4.4 Post-Mortem Inflection Cusp Extraction (`necropsy.py`)
+
+#### Reverse Z-Score Mathematical Formulation:
+$$
+\begin{aligned}
+\widetilde{F} &= \operatorname{median}(\{F_{\max}(\tau)\}_{\tau=t_0}^{t_{\text{crash}}-5}) \\
+\text{MAD} &= 1.4826 \times \operatorname{median}(\{|F_{\max}(\tau) - \widetilde{F}|\}_{\tau=t_0}^{t_{\text{crash}}-5}) \\
+Z(t) &= \frac{F_{\max}(t) - \widetilde{F}}{\text{MAD} + 10^{-6}}
+\end{aligned}
+$$
+
+The pre-collapse cusp frame $t^*$ is extracted by scanning backward from $t_{\text{crash}}-1$:
+$$
+t^* = \max \left\{ t \le t_{\text{crash}}-1 \;\middle|\; Z(t) \le 3.5 \;\land\; \min_{i < j} r_{ij}(t) \ge 0.85 (R_{\text{cov}, i} + R_{\text{cov}, j}) \right\}
+$$
+
 ```python
 def find_inflection_cusp(
     buffer: TrajectoryRingBuffer,
@@ -362,6 +377,10 @@ def select_next_model(
 
 ## 5. MLIP Calculator & Simulation Parameters
 - **MLIP Architecture**: `mace_mp` foundation model fine-tuned via `mlip.train`.
+- **Loss Formulation**:
+$$
+\mathcal{L} = \lambda_E \mathcal{L}_{\text{Huber}}(E, E_{\text{DFT}}) + \lambda_F \mathcal{L}_{\text{Huber}}(\mathbf{F}, \mathbf{F}_{\text{DFT}}) + \lambda_S \mathcal{L}_{\text{Huber}}(\boldsymbol{\sigma}, \boldsymbol{\sigma}_{\text{DFT}})
+$$
 - **Loss Weights**: $\lambda_E = 1.0$ (Huber), $\lambda_F = 20.0$ (Huber), $\lambda_S = 5.0$ (Huber on Cauchy stress).
 - **Optimization**: AdamW ($\text{lr} = 10^{-4}$), `ReduceLROnPlateau` (factor 0.6, patience 6, max 50 epochs).
 - **DFT Parameters**: Quantum ESPRESSO `PwBaseWorkChain` with CG diagonalization, cold smearing `degauss = 0.02 Ry`, `tstress = True`, `tprnfor = True`.
@@ -383,13 +402,13 @@ def select_next_model(
   - `dataset_file`: Cumulative `SinglefileData` (.xyz).
   - `epoch_idx`: Current iteration integer.
   - `temp_idx`: Index into `curriculum_config["temperatures"]`.
-  - `loss_weights`: Current training loss weights dict (boosted $1.5\times$ on gate rejection).
+  - `loss_weights`: Current training loss weights dict (boosted 1.5× on gate rejection).
   - `anchor_replay_ratio`: Current replay ratio (boosted to 0.30 on gate rejection).
   - `retry_count`: Consecutive gate failures counter.
 
 ## 7. Failure Modes & Recovery Workflows
 1. **Unphysical Crash Frame**: Discarded; rewound to cusp $t^*$ with $\min r_{ij} \ge 0.85 R_{\text{cov}}$ guarantee.
-2. **Invariance Gate Rejection**: If `evaluate_invariance_gate` returns `passed=False`, candidate checkpoint is rejected; `select_next_model` keeps `fallback_model`. The WorkGraph retries with loss weights boosted by $1.5\times$ and anchor replay ratio expanded to $30\%$.
+2. **Invariance Gate Rejection**: If `evaluate_invariance_gate` returns `passed=False`, candidate checkpoint is rejected; `select_next_model` keeps `fallback_model`. The WorkGraph retries with loss weights boosted by 1.5× and anchor replay ratio expanded to 30%.
 3. **Zero Candidate Frames in Stable MD**: If MD completes without tripping watchdogs and no frames fall within $[f_{\text{low}}, f_{\text{high}}]$, the curriculum increments `temp_idx` to advance to $T_{\text{next}}$. If already at $T_{\max}$, the loop terminates with `is_converged = True`.
 4. **Empty Dataset from 100% DFT Quarantine**: If all candidate frames in a batch fail electronic SCF convergence or clash checks, `dataset_collector` leaves the training dataset unchanged, and the MD trajectory is restarted from the previous epoch's stable checkpoint with a randomized velocity seed.
 5. **HPC Queue Overload**: Enforce `wg.max_number_jobs = 16` on the WorkGraph engine.

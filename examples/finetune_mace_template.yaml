@@ -1,0 +1,37 @@
+# ==============================================================================
+# MACE Fine-Tuning YAML Configuration Template
+# Guardrailed Active Learning for Quantum ESPRESSO (pw.x) & STFC janus-core
+# ==============================================================================
+# Model & Foundation Head Settings
+name: "mace_qe_finetuned"
+model: "ScaleShiftMACE"
+foundation_head: "matpes_r2scan"
+multiheads_finetuning: true
+foundation_model_readout: true
+
+# Dataset Keys (Mapped to Quantum ESPRESSO outputs)
+energy_key: "REF_energy"
+forces_key: "REF_forces"
+stress_key: "REF_stress"
+
+# Optimization & Loss Hyperparameters
+loss: "universal"
+energy_weight: 1.0
+forces_weight: 10.0
+stress_weight: 1.0
+E0s: "average"
+
+# Training Schedule & Hardware
+lr: 0.005
+batch_size: 2
+valid_batch_size: 1
+max_num_epochs: 2
+patience: 10
+eval_interval: 1
+clip_grad: 10.0
+default_dtype: "float32"
+device: "cpu"
+
+# STFC Janus-Core Execution Compliance
+tracker: false
+

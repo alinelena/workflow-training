@@ -1,0 +1,36 @@
+# ==============================================================================
+# Quantum ESPRESSO (pw.x) Calculation Template
+# Guardrailed Active Learning with STFC aiida-quantumespresso & janus-core
+# ==============================================================================
+code_label: "pw@localhost"
+pseudo_family: "SSSP/1.3/PBE/efficiency"
+pw_executable: "/usr/bin/pw.x"
+
+# K-Points Configuration: [1, 1, 1] for Gamma-only
+kpoints_mesh: [1, 1, 1]
+
+# PWscf Input Parameters Dictionary
+parameters:
+  CONTROL:
+    calculation: "scf"
+    restart_mode: "from_scratch"
+    tstress: true
+    tprnfor: true
+    verbosity: "high"
+  SYSTEM:
+    ecutwfc: 30.0
+    ecutrho: 240.0
+    occupations: "fixed"
+  ELECTRONS:
+    conv_thr: 1.0e-6
+    electron_maxstep: 100
+    mixing_beta: 0.7
+
+# Computational Resources for AiiDA CalcJob
+metadata:
+  options:
+    resources:
+      num_machines: 1
+      tot_num_mpiprocs: 1
+    max_wallclock_seconds: 1800
+

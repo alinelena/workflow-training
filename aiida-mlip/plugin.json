@@ -1,0 +1,15 @@
+{
+  "name": "aiida-mlip",
+  "version": "0.5.0",
+  "description": "Comprehensive AI skills, execution rules, and workflow automation for STFC aiida-mlip (machine learned interatomic potentials AiiDA plugin).",
+  "author": {
+    "name": "STFC / AiiDA-MLIP Contributors",
+    "url": "https://github.com/stfc/aiida-mlip"
+  },
+  "homepage": "https://stfc.github.io/aiida-mlip/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/stfc/aiida-mlip.git"
+  }
+}
+

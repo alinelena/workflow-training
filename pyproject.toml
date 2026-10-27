@@ -1,0 +1,43 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "workflow-training"
+version = "0.1.0"
+description = "Guardrailed Curriculum Active Learning WorkGraph (EpochMesh + Necropsy-Rewind) for MACE and Quantum ESPRESSO in aiida-workgraph"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "numpy>=1.24.0",
+    "scipy>=1.10.0",
+    "ase>=3.22.0",
+    "aiida-core>=2.4.0",
+    "aiida-workgraph>=0.4.0",
+    "aiida-mlip>=0.1.0",
+    "janus-core>=0.9.8",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=8.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-asyncio>=0.23.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/workflow_training"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+

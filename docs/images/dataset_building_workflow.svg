@@ -1,0 +1,252 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1420 980" width="100%" height="100%" style="background-color: #0f172a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+  <defs>
+    <!-- Drop Shadows -->
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="115%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.35"/>
+    </filter>
+    <filter id="glow-blue" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="4" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+
+    <!-- Gradients -->
+    <linearGradient id="grad-blue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+
+    <!-- Markers for arrows -->
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#38bdf8"/>
+    </marker>
+    <marker id="arrow-purple" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#c084fc"/>
+    </marker>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#f87171"/>
+    </marker>
+    <marker id="arrow-teal" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#2dd4bf"/>
+    </marker>
+    <marker id="arrow-amber" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#fbbf24"/>
+    </marker>
+  </defs>
+
+  <!-- ================= HEADER ================= -->
+  <g transform="translate(40, 25)">
+    <rect width="1340" height="60" rx="12" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+    <circle cx="30" cy="30" r="14" fill="#38bdf8" opacity="0.2"/>
+    <circle cx="30" cy="30" r="7" fill="#38bdf8"/>
+    <text x="60" y="28" fill="#f8fafc" font-size="18" font-weight="700">Guardrailed Active Learning: Dataset Building &amp; Fine-Tuning Pipeline</text>
+    <text x="60" y="47" fill="#94a3b8" font-size="13">EpochMesh + Necropsy-Rewind Provenance Architecture with 20% Anchor Replay &amp; Electronic Quarantine</text>
+    <rect x="1190" y="18" width="130" height="24" rx="12" fill="#0369a1"/>
+    <text x="1255" y="34" fill="#e0f2fe" font-size="11" font-weight="600" text-anchor="middle">STFC JANUS-CORE</text>
+  </g>
+
+  <!-- ================= STAGE 0: COLD-START SEEDING ================= -->
+  <g transform="translate(40, 105)" filter="url(#shadow)">
+    <rect width="400" height="530" rx="16" fill="#1e293b" stroke="#0284c7" stroke-width="2"/>
+    <!-- Stage Header -->
+    <path d="M 0 16 Q 0 0 16 0 L 384 0 Q 400 0 400 16 L 400 48 L 0 48 Z" fill="#0369a1"/>
+    <text x="20" y="30" fill="#ffffff" font-size="14" font-weight="700">STAGE 0: COLD-START ANCHOR RESERVOIR</text>
+    <rect x="330" y="14" width="55" height="20" rx="10" fill="#0c4a6e"/>
+    <text x="357" y="28" fill="#7dd3fc" font-size="10" font-weight="600" text-anchor="middle">SEED</text>
+
+    <!-- Node 1: Generator Function -->
+    <rect x="25" y="70" width="350" height="60" rx="10" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5"/>
+    <text x="40" y="94" fill="#38bdf8" font-size="13" font-weight="700">generate_cold_start_structures()</text>
+    <text x="40" y="114" fill="#94a3b8" font-size="11">Input: Equilibrium Diamond Silicon Unit Cell (V₀)</text>
+
+    <!-- Branch A: EOS Volumes -->
+    <rect x="25" y="160" width="165" height="70" rx="10" fill="#0f172a" stroke="#0284c7" stroke-width="1.2"/>
+    <text x="35" y="184" fill="#e0f2fe" font-size="12" font-weight="600">EOS Isotropic Strains</text>
+    <text x="35" y="202" fill="#94a3b8" font-size="10">7 configurations (±10%)</text>
+    <text x="35" y="217" fill="#38bdf8" font-size="10">V/V₀ ∈ [0.90, 1.10]</text>
+
+    <!-- Branch B: Harmonic Rattles -->
+    <rect x="210" y="160" width="165" height="70" rx="10" fill="#0f172a" stroke="#0284c7" stroke-width="1.2"/>
+    <text x="220" y="184" fill="#e0f2fe" font-size="12" font-weight="600">Harmonic Rattles</text>
+    <text x="220" y="202" fill="#94a3b8" font-size="10">Gaussian δ = 0.02 - 0.05 Å</text>
+    <text x="220" y="217" fill="#38bdf8" font-size="10">Applied at equilibrium</text>
+
+    <!-- Node 2: Group (Reservoir) -->
+    <rect x="25" y="260" width="350" height="90" rx="10" fill="#0c4a6e" stroke="#38bdf8" stroke-width="2"/>
+    <text x="40" y="286" fill="#ffffff" font-size="13" font-weight="700">AiiDA Group: stage0_anchors</text>
+    <text x="40" y="306" fill="#bae6fd" font-size="11">Permanent 20% Anchor-Replay Reservoir</text>
+    <text x="40" y="324" fill="#7dd3fc" font-size="10">• Prevents catastrophic forgetting of 0 K well</text>
+    <text x="40" y="338" fill="#7dd3fc" font-size="10">• Guaranteed baseline for bulk modulus retention</text>
+
+    <!-- Node 3: Initial File Data -->
+    <rect x="25" y="380" width="350" height="120" rx="10" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5"/>
+    <text x="40" y="406" fill="#38bdf8" font-size="13" font-weight="700">SinglefileData: dataset_v0.xyz</text>
+    <text x="40" y="426" fill="#f8fafc" font-size="11">Cumulative Dataset Initial State (Epoch 0)</text>
+    <rect x="40" y="438" width="320" height="48" rx="6" fill="#1e293b"/>
+    <text x="50" y="456" fill="#94a3b8" font-size="10">Extended XYZ headers: Lattice, energy, forces</text>
+    <text x="50" y="472" fill="#38bdf8" font-size="10">Initial size = 7 EOS + 4 Rattles = 11 configs</text>
+
+    <!-- Inner stage connections -->
+    <line x1="107" y1="130" x2="107" y2="160" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+    <line x1="292" y1="130" x2="292" y2="160" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+    <line x1="107" y1="230" x2="107" y2="260" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+    <line x1="292" y1="230" x2="292" y2="260" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+    <line x1="200" y1="350" x2="200" y2="380" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+  </g>
+
+  <!-- ================= STAGE 1: MAPPED DFT EVALUATION ================= -->
+  <g transform="translate(480, 105)" filter="url(#shadow)">
+    <rect width="430" height="260" rx="16" fill="#1e293b" stroke="#9333ea" stroke-width="2"/>
+    <path d="M 0 16 Q 0 0 16 0 L 414 0 Q 430 0 430 16 L 430 48 L 0 48 Z" fill="#6b21a8"/>
+    <text x="20" y="30" fill="#ffffff" font-size="14" font-weight="700">STAGE 1: MAPPED DFT JOBS (HPC CLUSTER)</text>
+    <rect x="360" y="14" width="55" height="20" rx="10" fill="#3b0764"/>
+    <text x="387" y="28" fill="#d8b4fe" font-size="10" font-weight="600" text-anchor="middle">QE</text>
+
+    <!-- Task 0: Valid -->
+    <rect x="25" y="65" width="380" height="52" rx="8" fill="#0f172a" stroke="#a855f7" stroke-width="1.2"/>
+    <circle cx="45" cy="91" r="6" fill="#22c55e"/>
+    <text x="60" y="86" fill="#f8fafc" font-size="12" font-weight="600">dft_task_0 (Valid Frontier Frame)</text>
+    <text x="60" y="103" fill="#94a3b8" font-size="10">scf_converged: True | Energy: -15.85 eV | F_max: 1.09 eV/Å</text>
+
+    <!-- Task 1: Electronic Failure -->
+    <rect x="25" y="125" width="380" height="52" rx="8" fill="#0f172a" stroke="#ef4444" stroke-width="1.2"/>
+    <circle cx="45" cy="151" r="6" fill="#ef4444"/>
+    <text x="60" y="146" fill="#fca5a5" font-size="12" font-weight="600">dft_task_1 (SCF Convergence Failure)</text>
+    <text x="60" y="163" fill="#94a3b8" font-size="10">scf_converged: False | Davidson loop deadlock (100 iters)</text>
+
+    <!-- Task 2: Covalent Clash -->
+    <rect x="25" y="185" width="380" height="52" rx="8" fill="#0f172a" stroke="#f97316" stroke-width="1.2"/>
+    <circle cx="45" cy="211" r="6" fill="#f97316"/>
+    <text x="60" y="206" fill="#fdba74" font-size="12" font-weight="600">dft_task_2 (Sub-Covalent Clash Frame)</text>
+    <text x="60" y="223" fill="#94a3b8" font-size="10">r_ij = 0.35 Å &lt; 0.85 R_cov (Unphysical overlap)</text>
+  </g>
+
+  <!-- ================= QUARANTINE BRANCH ================= -->
+  <g transform="translate(950, 105)" filter="url(#shadow)">
+    <rect width="430" height="260" rx="16" fill="#1e293b" stroke="#dc2626" stroke-width="2"/>
+    <path d="M 0 16 Q 0 0 16 0 L 414 0 Q 430 0 430 16 L 430 48 L 0 48 Z" fill="#991b1b"/>
+    <text x="20" y="30" fill="#ffffff" font-size="14" font-weight="700">ELECTRONIC QUARANTINE ISOLATION</text>
+    <rect x="345" y="14" width="70" height="20" rx="10" fill="#450a0a"/>
+    <text x="380" y="28" fill="#fca5a5" font-size="10" font-weight="600" text-anchor="middle">SHIELD</text>
+
+    <!-- Quarantine Dict -->
+    <rect x="25" y="65" width="380" height="75" rx="8" fill="#0f172a" stroke="#f87171" stroke-width="1.2"/>
+    <text x="40" y="90" fill="#f87171" font-size="12" font-weight="700">QuarantineData (orm.Dict)</text>
+    <text x="40" y="108" fill="#94a3b8" font-size="10">• n_quarantined = 2 calculations rejected</text>
+    <text x="40" y="122" fill="#fca5a5" font-size="10">• Isolates non-converged &amp; clashed trajectories</text>
+
+    <!-- Quarantine Group -->
+    <rect x="25" y="155" width="380" height="80" rx="8" fill="#450a0a" stroke="#ef4444" stroke-width="1.5"/>
+    <text x="40" y="180" fill="#ffffff" font-size="12" font-weight="700">AiiDA Group: quarantined_frames</text>
+    <text x="40" y="198" fill="#fecaca" font-size="10">Permanent Audit Log for DFT Diagnostics</text>
+    <text x="40" y="215" fill="#fca5a5" font-size="10">Protected: Never leaked into MACE training batches</text>
+
+    <line x1="215" y1="140" x2="215" y2="155" stroke="#f87171" stroke-width="1.5" marker-end="url(#arrow-red)"/>
+  </g>
+
+  <!-- ================= AUDIT & BLEND COLLECTOR ================= -->
+  <g transform="translate(480, 400)" filter="url(#shadow)">
+    <rect width="430" height="530" rx="16" fill="#1e293b" stroke="#0d9488" stroke-width="2"/>
+    <path d="M 0 16 Q 0 0 16 0 L 414 0 Q 430 0 430 16 L 430 48 L 0 48 Z" fill="#115e59"/>
+    <text x="20" y="30" fill="#ffffff" font-size="14" font-weight="700">DATASET COLLECTOR &amp; 20% REPLAY MIXER</text>
+    <rect x="345" y="14" width="70" height="20" rx="10" fill="#042f2e"/>
+    <text x="380" y="28" fill="#5eead4" font-size="10" font-weight="600" text-anchor="middle">AiiDA CF</text>
+
+    <!-- Function Box -->
+    <rect x="25" y="65" width="380" height="70" rx="8" fill="#0f172a" stroke="#2dd4bf" stroke-width="1.5"/>
+    <text x="40" y="88" fill="#2dd4bf" font-size="13" font-weight="700">collect_filter_and_accumulate_dataset</text>
+    <text x="40" y="106" fill="#94a3b8" font-size="10">Signature: (**gathered_dft, previous_dataset, anchor_group)</text>
+    <text x="40" y="120" fill="#5eead4" font-size="10">Maintains unbroken AiiDA dynamic task provenance</text>
+
+    <!-- Sub-Block 1: Valid Candidates -->
+    <rect x="25" y="150" width="180" height="80" rx="8" fill="#0f172a" stroke="#14b8a6" stroke-width="1"/>
+    <text x="35" y="172" fill="#ffffff" font-size="11" font-weight="600">Valid DFT Frames</text>
+    <text x="35" y="190" fill="#2dd4bf" font-size="12" font-weight="700">80% New Data</text>
+    <text x="35" y="206" fill="#94a3b8" font-size="10">n_valid = 1 accepted</text>
+    <text x="35" y="218" fill="#94a3b8" font-size="9">Covalent check ≥ 0.85</text>
+
+    <!-- Sub-Block 2: Replay Sampler -->
+    <rect x="225" y="150" width="180" height="80" rx="8" fill="#0f172a" stroke="#0284c7" stroke-width="1"/>
+    <text x="235" y="172" fill="#ffffff" font-size="11" font-weight="600">Stage 0 Replay</text>
+    <text x="235" y="190" fill="#38bdf8" font-size="12" font-weight="700">20% Quota Blend</text>
+    <text x="235" y="206" fill="#94a3b8" font-size="10">n_anchors = 1 replayed</text>
+    <text x="235" y="218" fill="#94a3b8" font-size="9">Sampled from group</text>
+
+    <!-- Sub-Block 3: Accumulator & Stream Blender -->
+    <rect x="25" y="250" width="380" height="110" rx="8" fill="#042f2e" stroke="#2dd4bf" stroke-width="1.5"/>
+    <text x="40" y="275" fill="#ffffff" font-size="13" font-weight="700">Extended XYZ Stream Blender</text>
+    <text x="40" y="295" fill="#bae6fd" font-size="11">Formula: Dataset_{t} = Dataset_{t-1} + Valid_{t} + Replay_{t}</text>
+    <rect x="40" y="308" width="350" height="40" rx="6" fill="#0f172a"/>
+    <text x="50" y="325" fill="#5eead4" font-size="10">• 100% Quarantine Shield: Keeps prior dataset if all fail</text>
+    <text x="50" y="338" fill="#94a3b8" font-size="10">• Total batch: 5 prior + 1 valid + 1 anchor = 7 configs</text>
+
+    <!-- Output Node: Updated File -->
+    <rect x="25" y="380" width="380" height="120" rx="10" fill="#0f172a" stroke="#2dd4bf" stroke-width="2"/>
+    <text x="40" y="408" fill="#2dd4bf" font-size="14" font-weight="700">SinglefileData: dataset_v1.xyz</text>
+    <text x="40" y="428" fill="#f8fafc" font-size="12">Accumulated Active Learning Dataset (Epoch 1)</text>
+    <rect x="40" y="440" width="350" height="48" rx="6" fill="#1e293b"/>
+    <text x="50" y="458" fill="#94a3b8" font-size="10">Target for next MACE retraining iteration</text>
+    <text x="50" y="474" fill="#2dd4bf" font-size="10">Stored in WorkGraph Context: wg.context['dataset_file']</text>
+
+    <!-- Inner collector lines -->
+    <line x1="115" y1="230" x2="115" y2="250" stroke="#2dd4bf" stroke-width="1.5" marker-end="url(#arrow-teal)"/>
+    <line x1="315" y1="230" x2="315" y2="250" stroke="#2dd4bf" stroke-width="1.5" marker-end="url(#arrow-teal)"/>
+    <line x1="215" y1="360" x2="215" y2="380" stroke="#2dd4bf" stroke-width="1.5" marker-end="url(#arrow-teal)"/>
+  </g>
+
+  <!-- ================= RETRAINING & INVARIANCE GATE ================= -->
+  <g transform="translate(950, 400)" filter="url(#shadow)">
+    <rect width="430" height="530" rx="16" fill="#1e293b" stroke="#d97706" stroke-width="2"/>
+    <path d="M 0 16 Q 0 0 16 0 L 414 0 Q 430 0 430 16 L 430 48 L 0 48 Z" fill="#b45309"/>
+    <text x="20" y="30" fill="#ffffff" font-size="14" font-weight="700">MACE RETRAINING &amp; INVARIANCE GATE</text>
+    <rect x="355" y="14" width="60" height="20" rx="10" fill="#451a03"/>
+    <text x="385" y="28" fill="#fde68a" font-size="10" font-weight="600" text-anchor="middle">GATE</text>
+
+    <!-- Node 1: Config Preparation -->
+    <rect x="25" y="65" width="380" height="85" rx="8" fill="#0f172a" stroke="#fbbf24" stroke-width="1.2"/>
+    <text x="40" y="88" fill="#fbbf24" font-size="12" font-weight="700">prepare_mace_training_config()</text>
+    <text x="40" y="105" fill="#fde68a" font-size="11">Outputs JanusConfigfile (YAML)</text>
+    <text x="40" y="122" fill="#94a3b8" font-size="10">• Huber loss: λ_E=1.0, λ_F=20.0, λ_S=5.0</text>
+    <text x="40" y="136" fill="#fbbf24" font-size="10">• Headless Rule: tracker: false (No CodeCarbon)</text>
+
+    <!-- Node 2: MLIP.TRAIN -->
+    <rect x="25" y="170" width="380" height="80" rx="8" fill="#0f172a" stroke="#d97706" stroke-width="1.5"/>
+    <text x="40" y="195" fill="#ffffff" font-size="13" font-weight="700">CalculationFactory('mlip.train')</text>
+    <text x="40" y="213" fill="#fde68a" font-size="11">Fine-Tunes Foundation Model on Cluster GPU</text>
+    <text x="40" y="230" fill="#94a3b8" font-size="10">Produces Candidate Model Checkpoint (mace_epoch_1)</text>
+
+    <!-- Node 3: 5-Stage Invariance Gate -->
+    <rect x="25" y="270" width="380" height="135" rx="8" fill="#451a03" stroke="#f59e0b" stroke-width="2"/>
+    <text x="40" y="295" fill="#ffffff" font-size="13" font-weight="700">5-Stage Physical Invariance Gate</text>
+    <text x="40" y="315" fill="#fde68a" font-size="10">1. Ground-state residual: F_max ≤ 0.025 eV/Å (Passed)</text>
+    <text x="40" y="332" fill="#fde68a" font-size="10">2. Bulk Modulus retention: |ΔB₀|/B₀ ≤ 8.0% (Passed)</text>
+    <text x="40" y="349" fill="#fde68a" font-size="10">3. Acoustic Γ-phonons: ω² ≥ -10⁻³ THz² (Passed)</text>
+    <text x="40" y="366" fill="#fde68a" font-size="10">4. SO(3) Equivariance: drift &lt; 10⁻⁴ eV (Passed)</text>
+    <text x="40" y="383" fill="#fde68a" font-size="10">5. 2 ps NVE/NPT Burn-In: Drift &lt; 10⁻⁴ eV/atom (Passed)</text>
+
+    <!-- Node 4: Model Selector Context Guard -->
+    <rect x="25" y="425" width="380" height="85" rx="8" fill="#0f172a" stroke="#22c55e" stroke-width="2"/>
+    <text x="40" y="450" fill="#22c55e" font-size="13" font-weight="700">select_next_model() Context Guard</text>
+    <text x="40" y="470" fill="#f8fafc" font-size="11">Gate Passed: Hot-swaps candidate model into context</text>
+    <text x="40" y="488" fill="#86efac" font-size="10">wg.context['current_model'] = mace_epoch_1.model</text>
+
+    <line x1="215" y1="150" x2="215" y2="170" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#arrow-amber)"/>
+    <line x1="215" y1="250" x2="215" y2="270" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#arrow-amber)"/>
+    <line x1="215" y1="405" x2="215" y2="425" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#arrow-amber)"/>
+  </g>
+
+  <!-- ================= INTER-STAGE CONNECTING PATHS ================= -->
+  <!-- 1. Stage 0 Dataset v0 -> Collector -->
+  <path d="M 440 460 L 480 460" stroke="#38bdf8" stroke-width="2" fill="none" marker-end="url(#arrow-blue)"/>
+  <!-- 2. Stage 0 Anchor Group -> Replay Sampler -->
+  <path d="M 440 305 C 460 305, 460 570, 705 570" stroke="#38bdf8" stroke-width="2" stroke-dasharray="4" fill="none" marker-end="url(#arrow-blue)"/>
+
+  <!-- 3. DFT Task 0 (Valid) -> Collector Valid Branch -->
+  <path d="M 695 365 L 695 400" stroke="#a855f7" stroke-width="2" fill="none" marker-end="url(#arrow-purple)"/>
+
+  <!-- 4. DFT Task 1 & 2 -> Quarantine Branch -->
+  <path d="M 910 235 L 950 235" stroke="#ef4444" stroke-width="2" fill="none" marker-end="url(#arrow-red)"/>
+
+  <!-- 5. Updated Dataset -> Training Config Prep -->
+  <path d="M 910 840 C 930 840, 930 465, 950 465" stroke="#2dd4bf" stroke-width="2.5" fill="none" marker-end="url(#arrow-teal)"/>
+
+</svg>

@@ -1,0 +1,15 @@
+{
+  "name": "janus-core",
+  "version": "0.9.8",
+  "description": "Comprehensive AI skills, execution rules, and workflow tools for STFC janus-core (atomistic simulations with MLIPs).",
+  "author": {
+    "name": "STFC / Janus-Core Contributors",
+    "url": "https://github.com/stfc/janus-core"
+  },
+  "homepage": "https://stfc.github.io/janus-core/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/stfc/janus-core.git"
+  }
+}
+

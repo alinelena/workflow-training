@@ -1,0 +1,43 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+.eggs/
+
+# Virtual environments
+.venv/
+env/
+venv/
+ENV/
+
+# Testing & Linting caches
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+
+# Logs & temporary files
+logs/
+*.log
+*.tmp
+*.bak
+*.swp
+*~
+
+# Run outputs, generated artifacts, and visualizations
+examples/mace_qe_finetune_run/
+examples/html/
+html/
+*.model
+*.aiida
+*.traj
+
+# AiiDA local repository / runtime
+.aiida/
+
